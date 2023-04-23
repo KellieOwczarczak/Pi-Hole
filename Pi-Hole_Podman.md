@@ -58,6 +58,14 @@ I was able to restart the Pi-Hole after an inadvertant shutdown of the router, b
 `sudo podman generate systemd --new --files --name pihole > pihole.service`
 `sudo mv pihole.service /etc/systemd/system`
 
+This alone did not work in my case, so I added.
+
+`sudo mv container-pihole.service /usr/lib/systemd/user`
+
+Then, I created a symbolic link.
+
+`sudo ln -sf /usr/lib/systemd/user/container-pihole.service /etc/systemd/system/pihole.service`
+
 Now, we must restart the systemctl daemon
 
 `sudo systemctl daemon-reload`
@@ -67,8 +75,15 @@ Now, enable the Pi-Hole service
 `sudo systemctl enable pihole.service`
 `sudo systemctl restart pihole.service`
 
+### If the result was an access denied error due to SELinux. Running the following allowed me to execute enable the pihole.service.
+
+`sudo setenforce 0`
+
+Then, repeat the systemctl restart and enable the Pi-Hole service.
+
 Check in on the status of the service
 
 `sudo systemctl status pihole.service`
 `sudo podman ps`
 
+![Pi-Hole Service Status](images/Screenshot_20230423_173632.png)
