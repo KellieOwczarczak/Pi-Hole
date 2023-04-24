@@ -6,9 +6,9 @@ This is my implementation of Pi-Hole on my network. You can use it as is or twea
 
 In order for the data to be retained in the event of a restart or update to the Pi-Hole container, you really should create volumes in Podman. This only needs to be done the one time.
 
-`sudo podman volume create etc_pihole`
+```sudo podman volume create etc_pihole```
 
-`sudo podman volume create etc_dnsmasq`
+```sudo podman volume create etc_dnsmasq```
 
 You can name the volumes however you like.
 
@@ -16,7 +16,7 @@ You can name the volumes however you like.
 
 There is really little to do here. You can create short-cuts if you wish. For instance, I am using Fish and I created a variable which really was unnecessary.
 
-`set container_name "pihole"`
+```set container_name "pihole"```
 
 I did nothing at this point to prepare my DNS. However, afterwards, I updated my dnsmasq DNS-lan.conf file to route the DNS server to the Pi-Hole ip on my network. (I deliberately did not wish to have Pi-Hole as my DHCP, so I am still running dnsmasq on the router itself.)
 
@@ -58,39 +58,39 @@ Now, I am not sure that all of this is necessary and I am sure that my SERVERIP 
 
 I was able to restart the Pi-Hole after an inadvertant shutdown of the router, but it did not automatically do so which necessitated a manual starting of it and a restart of NetworkManager. So, I went ahead and created service for the container.
 
-`sudo podman generate systemd --new --files --name pihole > pihole.service`
+```sudo podman generate systemd --new --files --name pihole > pihole.service```
 
-`sudo mv pihole.service /etc/systemd/system`
+```sudo mv pihole.service /etc/systemd/system```
 
 This alone did not work in my case, so I added.
 
-`sudo mv container-pihole.service /usr/lib/systemd/user`
+```sudo mv container-pihole.service /usr/lib/systemd/user```
 
 Then, I created a symbolic link.
 
-`sudo ln -sf /usr/lib/systemd/user/container-pihole.service /etc/systemd/system/pihole.service`
+```sudo ln -sf /usr/lib/systemd/user/container-pihole.service /etc/systemd/system/pihole.service```
 
 Now, we must restart the systemctl daemon
 
-`sudo systemctl daemon-reload`
+```sudo systemctl daemon-reload```
 
 Now, enable the Pi-Hole service
 
-`sudo systemctl enable pihole.service`
+```sudo systemctl enable pihole.service```
 
-`sudo systemctl restart pihole.service`
+```sudo systemctl restart pihole.service```
 
 ### If the result was an access denied error due to SELinux. Running the following allowed me to execute enable the pihole.service.
 
-`sudo setenforce 0`
+```sudo setenforce 0```
 
 Then, repeat the systemctl restart and enable the Pi-Hole service.
 
 Check in on the status of the service
 
-`sudo systemctl status pihole.service`
+```sudo systemctl status pihole.service```
 
-`sudo podman ps`
+```sudo podman ps```
 
 You should get something like this for the status.
 
